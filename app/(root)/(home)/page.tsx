@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import CallTypeList from '@/components/CallTypeList';
+import { getRandomGreeting } from '@/lib/utils';
 
 function Home() {
   const [now, setNow] = useState(new Date());
@@ -20,18 +21,22 @@ function Home() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setNow(new Date());
+      const newNow = new Date();
+
+      if (newNow.getMinutes() !== now.getMinutes()) {
+        setNow(newNow);
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [now]);
 
   return (
     <section className="flex size-full flex-col gap-10 text-white">
       <div className="h-[300px] w-full rounded-[20px] bg-hero bg-cover">
         <div className="flex h-full flex-col justify-between max-md:px-5 max-md:py-8 lg:p-11">
-          <h2 className="glassmorphism max-w-[270px] rounded py-2 text-center text-base font-normal">
-            Upcoming Call at: 12:30 PM
+          <h2 className="glassmorphism rounded py-2 text-center text-base font-normal">
+            {getRandomGreeting()}
           </h2>
 
           <div className="flex flex-col gap-2">

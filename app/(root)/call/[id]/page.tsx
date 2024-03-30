@@ -12,10 +12,9 @@ import Loader from '@/components/Loader';
 import useGetCallById from '@/hooks/useGetCallById';
 
 function Call({ params }: { params: { id: string } }) {
-  // eslint-disable-next-line
-  const { user, isLoaded } = useUser();
+  const { isLoaded } = useUser();
 
-  const [isSetupComplete, setIsSetupComplete] = useState();
+  const [isSetupComplete, setIsSetupComplete] = useState(false);
 
   const { call, isCallLoading } = useGetCallById(params.id);
 
@@ -28,7 +27,6 @@ function Call({ params }: { params: { id: string } }) {
           {isSetupComplete ? (
             <CallRoom />
           ) : (
-            // @ts-ignore
             <CallSetup {...{ setIsSetupComplete }} />
           )}
         </StreamTheme>

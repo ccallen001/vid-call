@@ -35,4 +35,15 @@ const AvatarImages = [
   '/images/avatar-5.png',
 ];
 
-export { SideBarLinks, AvatarImages };
+const Greetings = [
+  'You look great today!',
+  "How's it going?",
+  'Ready to take on the day!',
+  "What's up, buttercup?",
+  'You are awesome!',
+  'You are doing great!',
+  'You are amazing!',
+  'You are wonderful!',
+];
+
+export { SideBarLinks, AvatarImages, Greetings };
