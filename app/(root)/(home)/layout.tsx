@@ -1,10 +1,19 @@
+import { ReactNode } from 'react';
+import { Metadata } from 'next';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
-import { ReactNode } from 'react';
 
 interface HomeLayoutProps {
   children: ReactNode;
 }
+
+export const metadata: Metadata = {
+  title: 'Vid Call',
+  description: 'Video calling made fun!',
+  icons: {
+    icon: '/icons/logo.svg',
+  },
+};
 
 function HomeLayout({ children }: HomeLayoutProps) {
   return (

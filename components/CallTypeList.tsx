@@ -3,12 +3,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { useStreamVideoClient } from '@stream-io/video-react-sdk';
+import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
 import { useUser } from '@clerk/nextjs';
 
 import HomeCard from '@/components/HomeCard';
 import CallModal from '@/components/CallModal';
 import { toast } from '@/components/ui/use-toast';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+
+import ReactDatePicker from 'react-datepicker';
 
 function CallTypeList() {
   const router = useRouter();
@@ -17,13 +21,13 @@ function CallTypeList() {
 
   const { user } = useUser();
 
-  // eslint-disable-next-line
   const [values, setValues] = useState({
     dateTime: new Date(),
     description: '',
+    link: '',
   });
-  // eslint-disable-next-line
-  const [callDetails, setCallDetails] = useState({});
+
+  const [callDetails, setCallDetails] = useState<Call>();
 
   const [callState, setCallState] = useState<
     'isInstantCall' | 'isScheduleCall' | 'isJoinCall'
@@ -73,6 +77,8 @@ function CallTypeList() {
     }
   }
 
+  const callLink = `${process.env.NEXT_PUBLIC_BASE_URL}/call/${callDetails?.id}`;
+
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
       <HomeCard
@@ -103,13 +109,78 @@ function CallTypeList() {
         handleClick={() => router.push('/recordings')}
       />
 
+      {!callDetails ? (
+        <CallModal
+          isOpen={callState === 'isScheduleCall'}
+          onClose={() => setCallState(undefined)}
+          title="Create Call"
+          handleClick={createCall}
+        >
+          <div className="flex flex-col gap-2.5">
+            <label className="text-base font-normal leading-[22.4px] text-sky-2">
+              Add a description
+            </label>
+            <Textarea
+              className="border-none bg-dark-3 focus-visible:ring-0 focus-visible:ring-offset-0"
+              onChange={(e) =>
+                setValues({ ...values, description: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex w-full flex-col gap-2.5">
+            <label className="text-base font-normal leading-[22.4px] text-sky-2">
+              Select Date and Time
+            </label>
+            <ReactDatePicker
+              className="w-full rounded bg-dark-3 p-2 focus:outline-none"
+              selected={values.dateTime}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              timeCaption="🕒"
+              dateFormat="MMMM d, yyyy h:mm aa"
+              onChange={(date) => setValues({ ...values, dateTime: date! })}
+            />
+          </div>
+        </CallModal>
+      ) : (
+        <CallModal
+          isOpen={callState === 'isScheduleCall'}
+          onClose={() => setCallState(undefined)}
+          title="Call Created"
+          handleClick={() => {
+            navigator.clipboard.writeText(callLink);
+            toast({ title: 'Link Copied!' });
+          }}
+          image={'/icons/checked.svg'}
+          buttonIcon="/icons/copy.svg"
+          className="text-center"
+          buttonText="Copy Call Link"
+        />
+      )}
+
       <CallModal
+        isOpen={callState === 'isJoinCall'}
+        onClose={() => setCallState(undefined)}
+        title="Type the link here"
         className="text-center"
+        buttonText="Join Call"
+        handleClick={() => router.push(values.link)}
+      >
+        <Input
+          className="border-none bg-dark-3 focus-visible:ring-0 focus-visible:ring-offset-0"
+          placeholder="Call link"
+          onChange={(e) => setValues({ ...values, link: e.target.value })}
+        />
+      </CallModal>
+
+      <CallModal
         isOpen={callState === 'isInstantCall'}
+        onClose={() => setCallState(undefined)}
         title="Start an Instant Call"
+        className="text-center"
         buttonText="Start Call"
         handleClick={createCall}
-        onClose={() => setCallState(undefined)}
       />
     </section>
   );
